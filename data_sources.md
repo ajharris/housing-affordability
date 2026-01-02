@@ -6,31 +6,39 @@ Scope: 6 indicators (CMA-level) kept small and actionable.
 
 1) Median household (total) income (Census)
 - Provider: Statistics Canada
+- Product ID (PID): 98-10-0009-01
 - Geography level: Census Metropolitan Area (CMA)
 - Time range: Census years (e.g., 2016, 2021). Use the latest census release.
 - Key variables: `CMA name` (GEO_NAME or GEO), `REF_DATE` (year), `Median total income` (label differs by table)
 - Download method: StatCan Census table page (use the table viewer's "Download" → CSV). Recommended table: "Median total income of economic families and census families" (search StatCan census profile tables). Programmatic option: use StatCan Web Data Service `getFullTableDownloadCSV` with the table Product ID (PID) found on the table page. See: https://www.statcan.gc.ca/en/developers/wds
+- Direct download: https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/98-10-0009-01/en
 
 2) Annual population estimates (mid-year)
 - Provider: Statistics Canada
+- Product ID (PID): 17-10-0135-01
 - Geography level: CMA
 - Time range: annual (e.g., 2000–present)
 - Key variables: `CMA name`, `REF_DATE` (date/year), `Population`
 - Download method: StatCan table viewer or WDS. Example table pages: search "Population and dwelling counts" or "Estimates of population" on StatCan and use the CSV download or the WDS `getFullTableDownloadCSV` endpoint.
+- Direct download: https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/17-10-0135-01/en
 
 3) Unemployment rate (Labour Force Survey)
 - Provider: Statistics Canada
+- Product ID (PID): 14-10-0294-01
 - Geography level: CMA (monthly)
 - Time range: monthly, last ~10–20 years (or as available)
 - Key variables: `CMA name`, `REF_DATE` (YYYY-MM), `Unemployment rate`, `Labour force`, `Employed`, `Unemployed`
 - Download method: StatCan table viewer (Labour Force Survey by CMA) or WDS. Search for "Labour Force Survey CMA unemployment rate" on StatCan and download CSV from the table page or use WDS.
+- Direct download: https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/14-10-0294-01/en
 
 4) Consumer Price Index (CPI) — All-items (for real adjustments)
 - Provider: Statistics Canada
+- Product ID (PID): 18-10-0004-01
 - Geography level: Canada / province (use national CPI to deflate incomes)
 - Time range: monthly (long series)
 - Key variables: `REF_DATE`, `CPI_all_items`, `index_value`
 - Download method: StatCan time series pages or WDS. Example product: Consumer Price Index (CPI) — All-items (search StatCan for "CPI, all-items, Canada"). Download CSV from table page or use WDS endpoints.
+- Direct download: https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/18-10-0004-01/en
 
 5) Rental Market Survey — median rents and vacancy rates
 - Provider: Canada Mortgage and Housing Corporation (CMHC)
@@ -47,6 +55,7 @@ Scope: 6 indicators (CMA-level) kept small and actionable.
 - Download method: CMHC Housing Market Data tables. Page: https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/housing-data/data-tables/housing-market-data — select "Housing starts" and download CSV/Excel for CMA-level series.
 
 Notes on provider access and choosing exact tables:
+- **Statistics Canada WDS API Status**: The StatCan Web Data Service (WDS) API has experienced intermittent availability issues. To ensure reliable data access, this project uses direct table download URLs with known Product IDs (PIDs). The WDS search API can be used as a discovery tool when available, but is not required for downloading tables. Each StatCan dataset above now includes its PID and a direct download URL.
 - Statistics Canada: most useful programmatic entry point is the StatCan Open Data portal (https://www.statcan.gc.ca/en/developers/wds) and the table download endpoints. Each table page provides a CSV download link and an API-friendly endpoint. When automating, identify the table ID on StatCan and use the table's CSV export URL or the StatCan REST endpoints.
 - CMHC: data are published in the CMHC Housing Market Information Portal and often include direct CSV downloads or Excel files per report. Identify the RMS and Housing Starts pages for CMA-level exports and use the CSV links or download programmatically.
 - If an exact table ID is required for StatCan, locate the table on statcan.gc.ca and copy the CSV export URL; the ingest script below accepts direct CSV URLs or local filenames.
