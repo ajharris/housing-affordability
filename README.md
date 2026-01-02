@@ -2,10 +2,20 @@
 
 A data analysis project examining housing affordability across metropolitan areas using a comprehensive Affordability Stress Index (ASI).
 
+## StatCan WDS status (temporary blocker)
+
+As of YYYY-MM-DD, Statistics Canada WDS endpoints (e.g. `getAllCubesListLite`)
+were returning HTTP 404 responses.
+
+Ingestion logic and dataset specifications are in place, but execution is
+paused until the service is available again.
+
+This does not affect downstream feature engineering, modeling, or clustering
+design.
+
 ## Project Structure
 
 ```
-housing-affordability/
 ├── data/
 │   ├── raw/                    # Raw data files (gitignored)
 │   │   ├── .gitignore         # Excludes raw data from version control
