@@ -2,16 +2,13 @@
 
 A data analysis project examining housing affordability across metropolitan areas using a comprehensive Affordability Stress Index (ASI).
 
-## StatCan WDS status (temporary blocker)
+## StatCan WDS status
 
-As of YYYY-MM-DD, Statistics Canada WDS endpoints (e.g. `getAllCubesListLite`)
-were returning HTTP 404 responses.
+The WDS API endpoints have been updated to use the correct `/rest/` path as documented in the [StatCan WDS User Guide](https://www.statcan.gc.ca/en/developers/wds/user-guide).
 
-Ingestion logic and dataset specifications are in place, but execution is
-paused until the service is available again.
-
-This does not affect downstream feature engineering, modeling, or clustering
-design.
+Previous 404 errors were due to using incorrect endpoint paths (`/en/grp/wds/fn/` instead of `/rest/`). The endpoints are now configured correctly:
+- `getAllCubesListLite`: `https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesListLite`
+- `getFullTableDownloadCSV`: `https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/{PID}/en`
 
 ## Project Structure
 
