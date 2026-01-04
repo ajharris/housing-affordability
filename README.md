@@ -1,16 +1,39 @@
-# Housing Affordability Stress Index
+# Housing Affordability Stress Index (ASI)
 
-A data analysis project examining housing affordability across metropolitan areas using a comprehensive Affordability Stress Index (ASI).
+This project builds a plain-language score called the Affordability Stress Index (ASI). The score combines a few housing and income signals into one number so you can quickly compare Canadian metro areas. Higher ASI means more pressure on renters.
 
-## StatCan WDS status
+## What this project is for
 
-The WDS API endpoints have been updated to use the correct `/rest/` path as documented in the [StatCan WDS User Guide](https://www.statcan.gc.ca/en/developers/wds/user-guide).
+- Compare metros using a consistent, repeatable score.
+- Highlight places where rent is rising faster than incomes or vacancies are tight.
+- Support policy, planning, and research discussions with transparent inputs.
 
-Previous 404 errors were due to using incorrect endpoint paths (`/en/grp/wds/fn/` instead of `/rest/`). The endpoints are now configured correctly:
-- `getAllCubesListLite`: `https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesListLite`
-- `getFullTableDownloadCSV`: `https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/{PID}/en`
+## What this project is not
 
-## Project Structure
+- It does not prove cause and effect. It shows patterns, not why they happen.
+- It does not replace local analysis or on-the-ground context.
+- It does not measure homeownership affordability (mortgages and prices are not included yet).
+
+## Data sources in plain language
+
+We combine two trusted public sources:
+
+- Statistics Canada (StatCan): income, population, unemployment, and inflation data.
+- Canada Mortgage and Housing Corporation (CMHC): rents, vacancy rates, and housing starts.
+
+See `data_sources.md` for exact table IDs, links, and download notes.
+
+## How the ASI is built (simple version)
+
+We take three stress signals, scale them so they can be compared, and then average them:
+
+1. Rent-to-income pressure: how much of a typical household's income goes to rent.
+2. Rent growth: how quickly rent is rising year over year.
+3. Vacancy stress: low vacancy means tight supply, so we invert the vacancy rate.
+
+A higher combined score means more housing stress for renters. The score is meant to be compared across metros in the same run.
+
+## Project structure
 
 ```
 ├── data/
@@ -27,8 +50,8 @@ Previous 404 errors were due to using incorrect endpoint paths (`/en/grp/wds/fn/
 │   ├── 03_ingest_clean.ipynb      # Data ingestion and cleaning
 │   ├── 04_features_index.ipynb    # Feature engineering and ASI calculation
 │   ├── 05_pca.ipynb               # PCA diagnostics + interpretability artifacts
-│   └── 06_clustering.ipynb        # Clustering analysis (optionally uses PCA output)
-├── src/                       # Source code (optional for refactored functions)
+│   └── 06_clustering.ipynb        # KMeans + HDBSCAN clustering, personas, and checks
+├── src/                       # Source code (reusable functions)
 ├── report/
 │   └── figures/              # Generated visualizations and figures
 ├── README.md                 # Project documentation
@@ -51,57 +74,57 @@ Previous 404 errors were due to using incorrect endpoint paths (`/en/grp/wds/fn/
    ```
 
 3. Download raw data:
-   - See `data/raw/README.md` for detailed download instructions
-   - Place downloaded files in the `data/raw/` directory
+   - See `data/raw/README.md` for download instructions.
+   - Place downloaded files in `data/raw/`.
 
-## Usage
+## Run the analysis (notebook order)
 
-The workflow is organized into the following notebooks. Run them roughly in order (the PCA diagnostics slot between feature engineering and clustering):
+1. `notebooks/00_ingest_plan.ipynb` - list sources and check what is missing.
+2. `notebooks/01_ingest_statcan.ipynb` - bring in StatCan data.
+3. `notebooks/02_ingest_cmhc.ipynb` - bring in CMHC data.
+4. `notebooks/03_ingest_clean.ipynb` - clean and merge sources into a master file.
+5. `notebooks/04_features_index.ipynb` - build features and calculate ASI.
+6. `notebooks/05_pca.ipynb` - explain the features with PCA.
+7. `notebooks/06_clustering.ipynb` - group metros into similar profiles.
 
-1. **00_ingest_plan.ipynb** – Inventory prioritized sources, capture download URLs, and stage helper utilities for bulk downloads.
-2. **01_ingest_statcan.ipynb** – Build StatCan metro indicators from raw CSV exports or the WDS endpoints.
-3. **02_ingest_cmhc.ipynb** – Process CMHC Rental Market Survey workbooks into tidy metro-level tables.
-4. **03_ingest_clean.ipynb** – Join StatCan + CMHC feeds, reconcile geographies, and generate `metros_master.csv` / `metros_modeling.csv`.
-5. **04_features_index.ipynb** – Engineer affordability stress signals (rent-to-income, rent growth, vacancy stress) and compute the Affordability Stress Index via `src/compute_asi.py`.
-6. **05_pca.ipynb** – Run PCA on the standardized stress signals, save `report/figures/pca_explained_variance.png`, and export `data/processed/pca_loadings.csv` for interpretability.
-7. **06_clustering.ipynb** – Run a KMeans sweep in PCA space (K=2…10), justify the chosen K via silhouette/inertia, and export labeled metros plus PC1/PC2 cluster plots.
-
-Launch Jupyter and execute each notebook:
+Start Jupyter and run each notebook:
 
 ```bash
 jupyter notebook
 ```
 
-## Data
+## Outputs and how to read them
 
-- **Raw data**: Stored in `data/raw/` (not tracked by git). See download instructions in that directory.
-- **Processed data**: Cleaned datasets stored in `data/processed/`
-   - `metros_master.csv`: Master dataset with metropolitan area information
-   - `asi_scores.csv`: Calculated Affordability Stress Index scores
-   - `features_scaled.parquet` (or `.csv`): Engineered affordability signals with robust scaling (produced by `src/build_features.py`)
-   - `pca_loadings.csv`: PCA loading matrix exported by `notebooks/05_pca.ipynb`
-   - `clusters_kmeans.csv`: KMeans cluster assignments (PC1–PC3 space), exported by `notebooks/06_clustering.ipynb`
+- `data/processed/asi_scores.csv`: the main ASI results per metro.
+- `report/figures/asi_top15.png`: quick view of the 15 most stressed metros.
+- `report/figures/pca_explained_variance.png`: how much each feature contributes.
+- `report/figures/pca_clusters_kmeans.png` and `report/figures/pca_clusters_hdbscan.png`: grouping maps.
+- `report/figures/kmeans_k_sweep.png`: shows how the chosen number of clusters was selected.
 
-## Metro Crosswalk and Join Keys
+## What you can infer (and what you cannot)
 
-- Run the reproducible builder in [src/build_metros_master.py](src/build_metros_master.py) to regenerate the master metro table and refresh coverage diagnostics: `python src/build_metros_master.py`.
-- `metro_id` is the four-digit StatCan CMA code (last four digits of the 2021 DGUID) and is the canonical join key across sources.
-- `metro_name_std` keeps the human-readable CMA label, while `metro_slug` is an ASCII-safe slug used to standardize joins from verbose `GEO` strings (e.g., "Ottawa-Gatineau, Ontario/Quebec"). Provinces follow the same pattern via `province` and `province_slug`.
-- The builder also emits a missingness summary at [data/processed/metro_join_missingness_summary.csv](data/processed/metro_join_missingness_summary.csv) and the unmatched records at [data/processed/metro_join_missingness_unmatched.csv](data/processed/metro_join_missingness_unmatched.csv). As of this run, only the Ontario/Quebec split parts of Ottawa-Gatineau lack a direct CMA-level match and are flagged for manual handling.
+You can infer:
+- Which metros are under relatively higher renter pressure right now.
+- Whether that pressure is driven more by rent growth, low vacancy, or rent-to-income.
+- Which metros look similar to each other based on those signals.
 
-## Outputs
+You should not infer:
+- Why a metro is stressed (this needs local context and deeper analysis).
+- That the score predicts future migration or health outcomes.
+- That small differences in the score are meaningful on their own.
 
-- Analysis results and visualizations are saved to `report/figures/`
-- Processed datasets are saved to `data/processed/`
-- `data/processed/features_scaled.parquet` contains engineered affordability features
-  with robust scaling (median/IQR) applied by default via `src/build_features.py`
-  (`--scaler standard` for mean/std). Use `--output ...csv` if you prefer CSV.
-- `report/figures/asi_top15.png`, `report/figures/pca_explained_variance.png`, `report/figures/kmeans_k_sweep.png`, and `report/figures/pca_clusters_kmeans.png` capture the core diagnostic visuals generated by the ASI, PCA, and clustering notebooks, respectively.
+## Limitations and next steps
+
+- Data releases lag by months, so the score should be refreshed each cycle.
+- The current focus is renters, not owners.
+- Some metros have partial data or special cases (see the missingness summary).
+
+Next steps include adding ownership metrics, automating refreshes, and pairing the ASI with migration outcomes.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome. Please open a pull request with a clear description.
 
 ## License
 
-[Add your license here]
+This project is licensed under the MIT License. See the `LICENSE` file for details.
