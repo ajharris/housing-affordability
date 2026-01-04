@@ -1,0 +1,3 @@
+source,unique_geo_labels,matched_geos,unmatched_geos,partial_geos,sample_unmatched
+statcan_unemployment,43,41,2,2,"Ottawa-Gatineau, Quebec part, Ontario/Quebec; Ottawa-Gatineau, Ontario part, Ontario/Quebec"
+statcan_income,20,20,0,0,
