@@ -124,7 +124,7 @@ create_issue \
 
 create_issue \
   "Ingest CMHC indicators: rent, vacancy, supply proxies" \
-  "Pull CMHC variables for each metro.\n\nAcceptance criteria:\n- Notebook: 01_ingest_cmhc.ipynb (or similar)\n- Output: data/processed/cmhc_metro.csv\n- Variables include at minimum: avg rent (1BR or 2BR), vacancy rate, rent growth YoY if derivable\n\nNotes:\n- Document measurement definitions (e.g., what rent series is used).\n" \
+  "Pull CMHC variables for each metro.\n\nAcceptance criteria:\n- Notebook: 02_ingest_cmhc.ipynb (or similar)\n- Output: data/processed/cmhc_metro.csv\n- Variables include at minimum: avg rent (1BR or 2BR), vacancy rate, rent growth YoY if derivable\n\nNotes:\n- Document measurement definitions (e.g., what rent series is used).\n" \
   "type:data,priority:high" \
   "$MILESTONE_REF"
 
