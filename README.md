@@ -71,6 +71,13 @@ jupyter notebook
   - `metros_master.csv`: Master dataset with metropolitan area information
   - `asi_scores.csv`: Calculated Affordability Stress Index scores
 
+## Metro Crosswalk and Join Keys
+
+- Run the reproducible builder in [src/build_metros_master.py](src/build_metros_master.py) to regenerate the master metro table and refresh coverage diagnostics: `python src/build_metros_master.py`.
+- `metro_id` is the four-digit StatCan CMA code (last four digits of the 2021 DGUID) and is the canonical join key across sources.
+- `metro_name_std` keeps the human-readable CMA label, while `metro_slug` is an ASCII-safe slug used to standardize joins from verbose `GEO` strings (e.g., "Ottawa-Gatineau, Ontario/Quebec"). Provinces follow the same pattern via `province` and `province_slug`.
+- The builder also emits a missingness summary at [data/processed/metro_join_missingness_summary.csv](data/processed/metro_join_missingness_summary.csv) and the unmatched records at [data/processed/metro_join_missingness_unmatched.csv](data/processed/metro_join_missingness_unmatched.csv). As of this run, only the Ontario/Quebec split parts of Ottawa-Gatineau lack a direct CMA-level match and are flagged for manual handling.
+
 ## Outputs
 
 - Analysis results and visualizations are saved to `report/figures/`

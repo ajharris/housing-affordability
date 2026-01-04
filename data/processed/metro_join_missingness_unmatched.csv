@@ -1,0 +1,3 @@
+geo_label,metro_name_source,province_source,metro_slug,is_partial,metro_id,matched,source
+"Ottawa-Gatineau, Ontario part, Ontario/Quebec",Ottawa-Gatineau,Ontario/Quebec,ottawa_gatineau,True,,False,statcan_unemployment
+"Ottawa-Gatineau, Quebec part, Ontario/Quebec",Ottawa-Gatineau,Ontario/Quebec,ottawa_gatineau,True,,False,statcan_unemployment

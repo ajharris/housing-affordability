@@ -106,7 +106,13 @@ env.bak/
 
 # Data files (raw/processed) - adjust if you keep data in repo
 data/raw/
-data/processed/
+data/processed/*
+# Allowlist processed artifacts that must be versioned
+!data/processed/
+!data/processed/asi_scores.csv
+!data/processed/metros_master.csv
+!data/processed/metro_join_missingness_summary.csv
+!data/processed/metro_join_missingness_unmatched.csv
 
 # Notebook checkpoints and outputs
 .ipynb_checkpoints/
