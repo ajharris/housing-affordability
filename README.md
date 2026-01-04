@@ -86,6 +86,9 @@ jupyter notebook
 
 - Analysis results and visualizations are saved to `report/figures/`
 - Processed datasets are saved to `data/processed/`
+- `data/processed/features_scaled.parquet` contains engineered affordability features
+  with robust scaling (median/IQR) applied by default via `src/build_features.py`
+  (`--scaler standard` for mean/std). Use `--output ...csv` if you prefer CSV.
 
 ## Contributing
 
