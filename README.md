@@ -21,9 +21,10 @@ Previous 404 errors were due to using incorrect endpoint paths (`/en/grp/wds/fn/
 │       ├── metros_master.csv  # Master dataset of metropolitan areas
 │       └── asi_scores.csv     # Affordability Stress Index scores
 ├── notebooks/
-│   ├── 01_ingest_clean.ipynb      # Data ingestion and cleaning
-│   ├── 02_features_index.ipynb    # Feature engineering and ASI calculation
-│   └── 03_clustering.ipynb        # Clustering analysis
+│   ├── 01_ingest_statcan.ipynb    # StatCan metro ingest
+│   ├── 02_ingest_clean.ipynb      # Data ingestion and cleaning
+│   ├── 03_features_index.ipynb    # Feature engineering and ASI calculation
+│   └── 04_clustering.ipynb        # Clustering analysis
 ├── src/                       # Source code (optional for refactored functions)
 ├── report/
 │   └── figures/              # Generated visualizations and figures
@@ -54,9 +55,10 @@ Previous 404 errors were due to using incorrect endpoint paths (`/en/grp/wds/fn/
 
 The analysis is organized into three main notebooks:
 
-1. **01_ingest_clean.ipynb**: Load raw data, perform initial exploration, clean and preprocess data
-2. **02_features_index.ipynb**: Engineer features and calculate the Affordability Stress Index (ASI)
-3. **03_clustering.ipynb**: Perform clustering analysis to group metros by affordability patterns
+1. **01_ingest_statcan.ipynb**: Build StatCan metro variables from raw CSVs
+2. **02_ingest_clean.ipynb**: Load raw data, perform initial exploration, clean and preprocess data
+3. **03_features_index.ipynb**: Engineer features and calculate the Affordability Stress Index (ASI)
+4. **04_clustering.ipynb**: Perform clustering analysis to group metros by affordability patterns
 
 Run the notebooks in sequence:
 
