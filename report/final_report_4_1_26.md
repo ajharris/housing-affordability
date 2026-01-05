@@ -12,7 +12,11 @@ Imagine each metro as a household ledger. Rent-to-income is the share of pay dev
 
 ![Top ASI metros](figures/asi_top15.png)
 
-*Figure 1. Halifax, Moncton, Kelowna, and other mid-sized metros top the ASI leaderboard, reflecting simultaneous rent spikes and lagging incomes.*
+*Figure 1a. Halifax, Moncton, Kelowna, and other mid-sized metros top the ASI leaderboard, reflecting simultaneous rent spikes and lagging incomes.*
+
+![Bottom ASI metros](figures/asi_bottom15.png)
+
+*Figure 1b. Edmonton, Regina, Winnipeg, and similar relief metros sit at the opposite end of the ASI ranking, signalling where vacancy slack and slower rent growth still provide breathing room.*
 
 ## Data & Methods
 
