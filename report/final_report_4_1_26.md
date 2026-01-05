@@ -1,10 +1,14 @@
 # Housing Affordability Stress Index – Portfolio Summary (As run on 4/1/26)
 
+*Analyst*: Drew Harris
+
+*Contact*: andrew.harris (at) torontomu.ca
+
 ## Motivation & Framing
 
 Housing stress is a public-health and migration issue: renters who spend most of their paycheque on shelter defer medical care, while employers struggle to attract talent into high-cost metros. This project builds an Affordability Stress Index (ASI) to compare Canadian CMAs on three renter-facing signals—rent-to-income pressure, rent growth, and vacancy stress—so regional planners can identify which markets most urgently need supply, subsidies, or mobility support.
 
-Imagine each metro as a household ledger. Rent-to-income is the share of pay devoted to shelter, rent growth is the yearly jump in the grocery bill, and vacancy stress tells us how much buffer sits in savings. When all three push the wrong way, the books do not balance and families cut elsewhere. The ASI simply tallies those line items so we can see, at a glance, which communities are already stretched and which still have breathing room. Analysts get the exact math; the average reader sees which columns are flashing red.
+Imagine each metro as a household ledger. Rent-to-income is the share of pay devoted to shelter, rent growth is the yearly jump in the rent, and vacancy stress tells us how much buffer sits in savings or gets used for other things. When all three push the wrong way, the books do not balance and families cut elsewhere. The ASI simply tallies those line items so we can see, at a glance, which communities are already stretched and which still have breathing room. 
 
 ![Top ASI metros](figures/asi_top15.png)
 
@@ -17,11 +21,21 @@ Imagine each metro as a household ledger. Rent-to-income is the share of pay dev
 - **Dimensionality reduction** – `05_pca.ipynb` reprojects the signals into orthogonal PCs, documenting explained variance for transparency.
 - **Segmentation** – `06_clustering.ipynb` runs both centroid-based (KMeans) and density-based (HDBSCAN) clustering to surface personas and noise metros, then exports labeled tables and profile heatmaps.
 
+The Affordability Stress Index is the weighted mean of each metro’s scaled stress signals. For metro $m$ and stress features $f \in \mathcal{F}$ (rent-to-income, rent-growth, vacancy-stress), we drop any missing feature for that metro and re-normalize the remaining weights $w_f$ so they sum to one:
+
+$$
+\mathrm{ASI}_m = \frac{\sum_{f \in \mathcal{F}_m} w_f\, z_{m,f}}{\sum_{f \in \mathcal{F}_m} w_f}
+$$
+
+where $z_{m,f}$ is the robustly scaled value in `data/processed/features_scaled.csv`. In the current release all weights equal one, so each available signal contributes equally to the final score.
+
 For a plain-language read: first we gather audited statements—trusted StatsCan and CMHC releases. Next we adjust every series so dollars, percentages, and ratios can sit on the same page. Finally we run stress tests, much like a central bank does for major lenders, to see which metros behave alike when pressure rises. Specialists can open each notebook to trace every calculation, while a time-strapped mayor or community advocate can rely on the figures to glean the headline story.
 
 ![PCA explained variance](figures/pca_explained_variance.png)
 
 *Figure 2. PC1 captures the shared rent-to-income/vacancy pressure axis, while PC2 isolates high rent-growth metros.*
+
+Reading Figure 2: PC1 alone absorbs roughly 60% of the total variance, which means a single blended pressure axis (tight vacancies plus high rent-to-income) already explains most differences among metros. Adding PC2 lifts cumulative coverage to about 90%, so plotting metros in two dimensions retains the rent-growth storyline without much information loss. PC3 accounts for the remaining ~10% and behaves like noise; if it spikes for a metro it usually signals sparse data or short-lived shocks rather than a new structural stress channel.
 
 ![KMeans diagnostics](figures/kmeans_k_sweep.png)
 
