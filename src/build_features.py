@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Build engineered affordability features and scaled feature set.
+"""Build engineered affordability features and a scaled feature set.
 
-Default scaling: robust (median/IQR). Use --scaler standard for mean/std.
+We take raw inputs (income, rent, vacancy) and compute simple ratios,
+then scale them so different metros are comparable on the same scale.
+Default scaling is robust (median/IQR). Use --scaler standard for mean/std.
 """
 
 from __future__ import annotations
@@ -14,6 +16,7 @@ from typing import Dict, Iterable, List, Optional
 
 
 def parse_float(value: str) -> Optional[float]:
+    """Parse a numeric string and return None for blanks or NA tokens."""
     if value is None:
         return None
     value = value.strip()
@@ -79,8 +82,10 @@ def build_features(input_path: Path, scaler: str) -> List[Dict[str, Optional[flo
 
             rent_to_income = None
             if monthly_income and avg_rent is not None and avg_rent >= 0:
+                # Share of monthly income required for rent.
                 rent_to_income = avg_rent / monthly_income
 
+            # Invert vacancy so lower vacancy means higher stress.
             vacancy_stress = -vacancy if vacancy is not None else None
 
             rows.append(
@@ -112,6 +117,7 @@ def build_features(input_path: Path, scaler: str) -> List[Dict[str, Optional[flo
                 elif iqr == 0:
                     row[f"{name}_scaled"] = 0.0
                 else:
+                    # Scale by how far the value is from the median.
                     row[f"{name}_scaled"] = (value - median) / iqr
     else:
         stats = {name: standard_stats([r[name] for r in rows]) for name in feature_names}
@@ -125,6 +131,7 @@ def build_features(input_path: Path, scaler: str) -> List[Dict[str, Optional[flo
                 elif std == 0:
                     row[f"{name}_scaled"] = 0.0
                 else:
+                    # Standard z-score scaling.
                     row[f"{name}_scaled"] = (value - mean) / std
 
     return rows

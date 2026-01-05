@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Compute an Affordability Stress Index (ASI) and optional PC1 comparison."""
+"""Compute the Affordability Stress Index (ASI) and an optional PC1 check.
+
+ASI is a single score that averages three scaled stress signals
+(rent-to-income, rent growth, and vacancy stress). A higher score means
+more housing pressure for renters. The optional PC1 score is a diagnostic
+that shows whether a one-dimensional PCA agrees with the ASI ranking.
+"""
 
 from __future__ import annotations
 
@@ -21,7 +27,7 @@ FEATURES = [
 
 
 def parse_float(value: Optional[str]) -> Optional[float]:
-    """Parse a numeric cell value, returning None for blanks/NA tokens."""
+    """Parse a numeric cell value, returning None for blanks or NA tokens."""
     if value is None:
         return None
     value = value.strip()
@@ -44,11 +50,11 @@ def compute_asi(
     rows: List[Dict[str, Optional[str]]],
     weights: Dict[str, float],
 ) -> Tuple[List[Dict[str, Optional[str]]], Dict[str, float]]:
-    """Compute ASI as a weighted mean of standardized feature signals.
+    """Compute ASI as a weighted average of the scaled stress features.
 
-    - Weights are normalized to sum to 1 for transparency.
-    - Missing feature values are skipped, and weights are re-normalized per row.
-    - Outputs: asi_score (stringified float) and asi_components_used (count).
+    Weights are normalized to sum to 1. If a row is missing a feature,
+    the remaining weights are re-normalized for that row so the score
+    still averages what is available.
     """
     weight_sum = sum(weights.values())
     if weight_sum <= 0:
@@ -78,8 +84,8 @@ def compute_asi(
 def compute_pc1_scores(rows: List[Dict[str, Optional[str]]]) -> None:
     """Compute a standardized PC1 score for comparison (optional diagnostic).
 
-    Uses only rows with complete FEATURES. The PC1 direction is aligned to ASI
-    so that higher values indicate more stress when correlation is negative.
+    This uses only rows with complete feature data. We flip the PC1 direction
+    when needed so that higher values still mean more stress, matching ASI.
     """
     data = []
     row_indices = []
@@ -125,6 +131,7 @@ def compute_pc1_scores(rows: List[Dict[str, Optional[str]]]) -> None:
         if asi_array.std() > 0 and pc1_array.std() > 0:
             corr = np.corrcoef(asi_array, pc1_array)[0, 1]
             if corr < 0:
+                # Flip direction so high PC1 still means high stress.
                 standardized = -standardized
 
     for idx, score in zip(row_indices, standardized):

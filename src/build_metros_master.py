@@ -1,4 +1,8 @@
-"""Build the metro master table and surface join coverage across StatCan sources."""
+"""Build the metro master table and summarize join coverage across sources.
+
+The goal is to create one clean list of metros and a stable join key
+(`metro_id`) so different datasets can be merged consistently.
+"""
 
 from __future__ import annotations
 
@@ -46,12 +50,14 @@ def clean_city_label(label: str) -> str:
 
 
 def extract_province(label: str) -> str:
+    """Extract the province name from a StatCan GEO label."""
     if not isinstance(label, str) or "," not in label:
         return ""
     return label.split(",")[-1].strip()
 
 
 def build_master_from_population() -> pd.DataFrame:
+    """Use the population file as the source of truth for CMA IDs."""
     cols = ["GEO", "DGUID", "Gender", "Age group"]
     df = pd.read_csv(POPULATION_FILE, usecols=cols, dtype={"DGUID": "string"})
     mask = (df["Age group"] == "All ages") & (df["Gender"] == "Total - gender")
@@ -69,6 +75,7 @@ def build_master_from_population() -> pd.DataFrame:
             "boundary_year": 2021,
         }
     )
+    # Slugs keep joins stable even when labels differ slightly across files.
     master["metro_slug"] = master["metro_name_std"].apply(slugify)
     master["province_slug"] = master["province"].apply(slugify)
     master = master[
@@ -91,6 +98,7 @@ def build_master_from_population() -> pd.DataFrame:
 
 
 def load_geo_labels(path: Path, *, require_cma_tag: bool = False) -> pd.DataFrame:
+    """Load and normalize GEO labels from a StatCan CSV."""
     df = pd.read_csv(path, usecols=["GEO"])
     df = df.dropna(subset=["GEO"])
     if require_cma_tag:
@@ -109,6 +117,7 @@ def load_geo_labels(path: Path, *, require_cma_tag: bool = False) -> pd.DataFram
 
 
 def summarize_missingness(master: pd.DataFrame, geo_df: pd.DataFrame, source: str) -> tuple[dict[str, object], pd.DataFrame]:
+    """Compare source labels to the master list and record what does not match."""
     merged = geo_df.merge(master[["metro_slug", "metro_id"]], on="metro_slug", how="left", indicator=True)
     merged["matched"] = merged["_merge"] == "both"
     merged.drop(columns="_merge", inplace=True)
