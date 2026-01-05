@@ -100,7 +100,7 @@ jupyter notebook
 - `report/figures/pca_explained_variance.png`: how much each feature contributes.
 - `report/figures/pca_clusters_kmeans.png` and `report/figures/pca_clusters_hdbscan.png`: grouping maps.
 - `report/figures/kmeans_k_sweep.png`: shows how the chosen number of clusters was selected.
-- `report/final_report_1_4_26.md`: short narrative write-up with the headline figures for sharing (as run on 1/4/26).
+- `report/final_report_1_4_26.md`: short narrative write-up with the headline figures for sharing (as run on 4/1/26).
 
 ## What you can infer (and what you cannot)
 
